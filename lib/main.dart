@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
         ),
+        debugShowCheckedModeBanner: false,
         home: const MyHomePage(title: 'Flutter Demo Home Page'),
         locale: const Locale('ru'), // Устанавливаем локаль для всего приложения
         supportedLocales: const [

@@ -41,11 +41,15 @@ class SaveDialog extends StatelessWidget {
         ),
       ),
       actions: <Widget>[
-        TextButton(
-          child: const Text('OK'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
+        Container(
+          width: 100,
+          height: 50,
+          child: TextButton(
+            child: const Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
         ),
       ],
     ).animate().scale(duration: 500.ms, curve: Curves.easeInOut);

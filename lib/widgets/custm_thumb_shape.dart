@@ -56,7 +56,7 @@ class _SliderWithCustomThumbState extends State<SliderWithCustomThumb> {
       data: SliderTheme.of(context).copyWith(
         activeTrackColor: Colors.orange,
         inactiveTrackColor: Colors.grey,
-        thumbColor: Colors.orange,
+        // thumbColor: Colors.orange,
         overlayColor: Colors.orange.withOpacity(0.2),
         trackHeight: 4.0,
         overlayShape: SliderComponentShape.noOverlay,

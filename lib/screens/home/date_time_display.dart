@@ -22,36 +22,37 @@ class _DateTimeDisplayState extends State<DateTimeDisplay> {
           MaterialPageRoute(builder: (context) => const CalendarPage()),
         );
       },
-      child: Container(
-        margin: EdgeInsets.only(top: 20),
-        height: 30,
-        color: Color(0xfffdfc),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Stack(
-              children: <Widget>[
-                Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    formattedDate,
-                    style: const TextStyle(
-                        fontSize: 18,
-                        fontFamily: 'Nunito-bold',
-                        color: Color(0xffBCBCBF)),
+      child: SafeArea(
+        child: Container(
+          height: 30,
+          color: const Color(0xfffdfc),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Stack(
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      formattedDate,
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontFamily: 'Nunito-bold',
+                          color: Color(0xffBCBCBF)),
+                    ),
                   ),
-                ),
-                const Align(
-                  alignment: Alignment.centerRight,
-                  child: Icon(
-                    Icons.calendar_month,
-                    size: 26,
-                    color: Color(0xffBCBCBF),
+                  const Align(
+                    alignment: Alignment.centerRight,
+                    child: Icon(
+                      Icons.calendar_month,
+                      size: 26,
+                      color: Color(0xffBCBCBF),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

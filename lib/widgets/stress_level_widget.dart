@@ -25,6 +25,7 @@ class _StressLevelWidgetState extends State<StressLevelWidget> {
   @override
   Widget build(BuildContext context) {
     double containerWidth = MediaQuery.of(context).size.width * 0.9;
+    Color activeColor = _currentValue != 3.0 ? Colors.orange : Colors.grey;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
@@ -72,14 +73,14 @@ class _StressLevelWidgetState extends State<StressLevelWidget> {
                     left: 0,
                     right: 0,
                     child: SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        activeTrackColor: Colors.orange,
+                      data: SliderThemeData(
+                        activeTrackColor: activeColor,
                         inactiveTrackColor: Colors.grey,
-                        thumbColor: Colors.orange,
-                        overlayColor: Colors.orange.withOpacity(0.2),
-                        trackHeight: 4.0,
+                        thumbColor: activeColor,
+                        overlayColor: activeColor.withOpacity(0.2),
                         overlayShape: SliderComponentShape.noOverlay,
-                        thumbShape: const CustomThumbShape(
+                        trackHeight: 4.0,
+                        thumbShape: CustomThumbShape(
                           enabledThumbRadius: 10.0,
                           borderWidth: 5.0,
                           borderColor: Colors.white,
