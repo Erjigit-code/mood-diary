@@ -18,6 +18,7 @@ class NotesInput extends StatelessWidget {
       height: 90,
       width: containerWidth,
       child: TextField(
+        textInputAction: TextInputAction.done,
         controller: _notesController,
         focusNode: focusNode, // Add this line
         maxLines: 4,

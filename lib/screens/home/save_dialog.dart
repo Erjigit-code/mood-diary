@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mood_diary/blocs/mood_bloc/mood_diary_bloc.dart';
+import 'package:mood_diary/blocs/mood_bloc/mood_diary_event.dart';
+import 'package:mood_diary/screens/home/journal_tab.dart';
+
+import 'package:mood_diary/screens/home/mood_entry.dart';
 
 class SaveDialog extends StatelessWidget {
   final String selectedMoodTab;
@@ -30,14 +36,13 @@ class SaveDialog extends StatelessWidget {
       ),
       backgroundColor: Colors.white.withOpacity(0.75),
       content: SingleChildScrollView(
-        child: ListBody(
-          children: <Widget>[
-            _buildMoodInfo(),
-            _buildChipInfo(),
-            _buildStressLevelInfo(),
-            _buildSelfEsteemLevelInfo(),
-            _buildNotesInfo(),
-          ],
+        child: MoodEntryWidget(
+          selectedMoodTab: selectedMoodTab,
+          selectedMoodImage: selectedMoodImage,
+          selectedChips: selectedChips,
+          stressLevel: stressLevel,
+          selfEsteemLevel: selfEsteemLevel,
+          notes: notes,
         ),
       ),
       actions: <Widget>[
@@ -47,49 +52,15 @@ class SaveDialog extends StatelessWidget {
           child: TextButton(
             child: const Text('OK'),
             onPressed: () {
-              Navigator.of(context).pop();
+              context.read<MoodDiaryBloc>().add(Save());
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => JournalScreen()),
+              );
             },
           ),
         ),
       ],
     ).animate().scale(duration: 500.ms, curve: Curves.easeInOut);
-  }
-
-  Widget _buildMoodInfo() {
-    return Column(
-      children: [
-        const SizedBox(width: 10),
-        Text(
-          textAlign: TextAlign.center,
-          'Ваше настроение: $selectedMoodTab',
-          style: TextStyle(fontSize: 25),
-        ),
-        if (selectedMoodImage != null)
-          Container(
-            height: 150,
-            width: 150,
-            child: Image.asset(
-              selectedMoodImage!,
-              fit: BoxFit.fill,
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildChipInfo() {
-    return Text('Вы испытваете: ${selectedChips.join(', ')}');
-  }
-
-  Widget _buildStressLevelInfo() {
-    return Text('Уровень стресса: ${stressLevel.toStringAsFixed(1)}');
-  }
-
-  Widget _buildSelfEsteemLevelInfo() {
-    return Text('Самооценка: ${selfEsteemLevel.toStringAsFixed(1)}');
-  }
-
-  Widget _buildNotesInfo() {
-    return Text('Ваша заметка: $notes');
   }
 }

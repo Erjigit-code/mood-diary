@@ -1,35 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mood_diary/blocs/calendar_bloc/bloc/calendar_bloc.dart';
+import 'package:mood_diary/blocs/calendar_bloc/bloc/calendar_event.dart';
+import 'package:mood_diary/screens/calendar/month_calendar.dart';
 
-class CalendarPage extends StatefulWidget {
+class CalendarPage extends StatelessWidget {
   const CalendarPage({super.key});
 
   @override
-  CalendarPageState createState() => CalendarPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => CalendarBloc(),
+      child: const CalendarPageContent(),
+    );
+  }
 }
 
-class CalendarPageState extends State<CalendarPage> {
+class CalendarPageContent extends StatefulWidget {
+  const CalendarPageContent({super.key});
+
+  @override
+  CalendarPageContentState createState() => CalendarPageContentState();
+}
+
+class CalendarPageContentState extends State<CalendarPageContent> {
   final ScrollController _scrollController = ScrollController();
   final Map<int, GlobalKey> _monthKeys = {};
-  late final int currentMonthIndex;
-  DateTime? _selectedDay;
 
   @override
   void initState() {
     super.initState();
-    currentMonthIndex = DateTime.now().month - 1;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToCurrentMonth();
     });
   }
 
   void _scrollToCurrentMonth() {
+    final currentMonthIndex =
+        context.read<CalendarBloc>().state.currentMonthIndex;
     if (_monthKeys.containsKey(currentMonthIndex)) {
       final context = _monthKeys[currentMonthIndex]!.currentContext;
       if (context != null) {
         Scrollable.ensureVisible(context,
-            duration: Duration(seconds: 1), curve: Curves.easeInOut);
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut);
       }
     }
   }
@@ -41,23 +55,24 @@ class CalendarPageState extends State<CalendarPage> {
   }
 
   void _goToToday() {
+    context.read<CalendarBloc>().add(ScrollToCurrentMonth());
     _scrollToCurrentMonth();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffFFFDFC),
+      backgroundColor: const Color(0xffFFFDFC),
       appBar: AppBar(
-        surfaceTintColor: Color(0xffFFFDFC),
+        surfaceTintColor: const Color(0xffFFFDFC),
         automaticallyImplyLeading: false,
-        backgroundColor: Color(0xffFFFDFC),
+        backgroundColor: const Color(0xffFFFDFC),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              color: Color(0xffBCBCBF),
-              icon: Icon(Icons.close),
+              color: const Color(0xffBCBCBF),
+              icon: const Icon(Icons.close),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -82,27 +97,25 @@ class CalendarPageState extends State<CalendarPage> {
             const DaysOfWeekHeader(),
             const SizedBox(height: 20),
             Expanded(
-              child: SingleChildScrollView(
+              child: ListView.builder(
                 controller: _scrollController,
-                child: Column(
-                  children: List.generate(12, (index) {
-                    DateTime month =
-                        DateTime(DateTime.now().year, index + 1, 1);
-                    _monthKeys[index] = GlobalKey();
-                    return Container(
-                      key: _monthKeys[index],
-                      child: MonthCalendar(
-                        month: month,
-                        selectedDay: _selectedDay,
-                        onDaySelected: (selectedDay) {
-                          setState(() {
-                            _selectedDay = selectedDay;
-                          });
-                        },
-                      ),
-                    );
-                  }),
-                ),
+                itemCount: 12,
+                cacheExtent: MediaQuery.of(context).size.height * 3,
+                itemBuilder: (context, index) {
+                  DateTime month = DateTime(DateTime.now().year, index + 1, 1);
+                  _monthKeys[index] = GlobalKey();
+                  return Container(
+                    key: _monthKeys[index],
+                    child: MonthCalendar(
+                      month: month,
+                      onDaySelected: (selectedDay) {
+                        context
+                            .read<CalendarBloc>()
+                            .add(DaySelected(selectedDay));
+                      },
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -128,99 +141,6 @@ class DaysOfWeekHeader extends StatelessWidget {
               color: Color(0xffBCBCBF), fontFamily: 'Nunito', fontSize: 16),
         );
       }).toList(),
-    );
-  }
-}
-
-class MonthCalendar extends StatelessWidget {
-  final DateTime month;
-  final DateTime? selectedDay;
-  final void Function(DateTime) onDaySelected;
-
-  const MonthCalendar({
-    super.key,
-    required this.month,
-    required this.selectedDay,
-    required this.onDaySelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    String year = DateFormat.y('ru').format(month); // Текущий год
-    String monthName = toBeginningOfSentenceCase(DateFormat.MMMM('ru')
-        .format(month))!; // Название месяца с большой буквы
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          year,
-          style: const TextStyle(
-              fontSize: 16,
-              fontFamily: 'Nunito-bold',
-              color: Color(0xffbcbcbf)),
-        ),
-        Text(
-          monthName,
-          style: const TextStyle(fontSize: 24, fontFamily: 'Nunito-bold'),
-        ),
-        TableCalendar(
-          daysOfWeekVisible: false,
-          locale: 'ru_RU',
-          firstDay: DateTime.utc(2022, 1, 1),
-          lastDay: DateTime.utc(2024, 12, 31),
-          focusedDay: month,
-          headerVisible: false,
-          pageJumpingEnabled: false,
-          availableGestures: AvailableGestures.none, // Отключить жесты
-          pageAnimationEnabled: false, // Отключить анимацию страниц
-          selectedDayPredicate: (day) => isSameDay(selectedDay, day),
-          onDaySelected: (selectedDay, focusedDay) {
-            onDaySelected(selectedDay);
-          },
-          calendarStyle: CalendarStyle(
-            weekendTextStyle: TextStyle(
-                fontSize: 18, fontFamily: 'Nunito', color: Color(0xff4C4C69)),
-            selectedTextStyle: TextStyle(
-                fontSize: 18, fontFamily: 'Nunito', color: Color(0xff4C4C69)),
-            outsideDaysVisible: false,
-            defaultTextStyle: const TextStyle(
-                fontSize: 18, fontFamily: 'Nunito', color: Color(0xff4C4C69)),
-            todayDecoration: const BoxDecoration(
-              color: Colors.orange,
-              shape: BoxShape.circle,
-            ),
-            selectedDecoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.orange.withOpacity(0.3),
-            ),
-            markersMaxCount: 1,
-            markerDecoration: const BoxDecoration(
-              color: Colors.orange,
-              shape: BoxShape.circle,
-            ),
-          ),
-          calendarBuilders: CalendarBuilders(
-            markerBuilder: (context, date, events) {
-              if (isSameDay(selectedDay, date)) {
-                return Positioned(
-                  bottom: 10,
-                  child: Container(
-                    width: 5,
-                    height: 5,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.orange,
-                    ),
-                  ),
-                );
-              }
-              return null;
-            },
-          ),
-        ),
-        const SizedBox(height: 20), // Добавляем отступ между месяцами
-      ],
     );
   }
 }

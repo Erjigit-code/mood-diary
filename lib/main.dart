@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:mood_diary/bloc/mood_diary_bloc.dart';
+import 'package:mood_diary/blocs/mood_bloc/mood_diary_bloc.dart';
 import 'screens/home/home_page.dart';
 
 void main() {

@@ -131,7 +131,6 @@ class _MoodWidgetState extends State<MoodWidget> {
                 child: Container(
                   height: 118,
                   width: 83,
-                  padding: const EdgeInsets.all(10),
                   margin: const EdgeInsets.symmetric(horizontal: 5),
                   decoration: BoxDecoration(
                     color: Colors.white,
